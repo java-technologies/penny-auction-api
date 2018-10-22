@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ public class LotsRepositoryImpl implements LotsRepository {
             List<Product> results = productQuery.getResultList();
             if (results.size() > 0) lot.setProduct((Product) productQuery.getSingleResult());
             if (lot.getProduct() != null) categoryMap.put(lot.getProduct().getId(), null);
-            lot.setStartDate(new Date());
         }
         // Get categories
         if (categoryMap.keySet().size() > 0) {
@@ -51,5 +49,30 @@ public class LotsRepositoryImpl implements LotsRepository {
 
         // Return list
         return lots;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Lot getLotById(int id) {
+        Query query = entityManager.createNativeQuery("SELECT * FROM lots WHERE id = :id", Lot.class);
+        query.setParameter("id", id);
+
+        // Check if such lot present
+        List<Lot> lots = (List<Lot>) query.getResultList();
+        if (lots == null || lots.size() == 0) return null;
+        Lot lot = lots.get(0);
+
+        // Get product
+        Query productQuery = entityManager.createNativeQuery("SELECT * FROM products WHERE lot_id = :lid", Product.class);
+        productQuery.setParameter("lid", lot.getId());
+        lot.setProduct((Product) productQuery.getSingleResult());
+        if (lot.getProduct() != null) {
+            // Get category
+            Query categoryQuery = entityManager.createNativeQuery("SELECT * FROM categories WHERE id = :cid", Category.class);
+            categoryQuery.setParameter("cid", lot.getProduct().getCategoryId());
+            lot.getProduct().setCategory((Category) categoryQuery.getSingleResult());
+        }
+
+        return lot;
     }
 }
