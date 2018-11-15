@@ -5,9 +5,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/auction}
+    username: ${DB_USER:auction_admin}
+    password: ${DB_PASSWORD:aucpass}
 
   http:
     encoding:
