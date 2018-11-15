@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/auction
+    username: auction_admin
+    password: aucpass
+
+  http:
+    encoding:
+      enabled: true
+      force: true
+      charset: UTF-8
