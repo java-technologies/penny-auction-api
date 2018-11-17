@@ -3,6 +3,7 @@ package com.pennyauction.pennyauction.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.pennyauction.pennyauction.model.Bid;
 import com.pennyauction.pennyauction.model.Lot;
 import com.pennyauction.pennyauction.model.Product;
 import com.pennyauction.pennyauction.repository.contract.LotsRepository;
@@ -64,5 +65,39 @@ public class LotsController {
             String result = "{\"error\":\"exception raised converting lot " + id + "to json\"}";
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/lots/{lotId}/bids", method = RequestMethod.GET)
+    public ResponseEntity getBids(@PathVariable int lotId) {
+        List<Bid> bids = lotsRepository.getBidsList(lotId);
+        if (bids == null) {
+            return new ResponseEntity<>("{\"error\":\"Lot with such id does not exist\"}", HttpStatus.NOT_FOUND);
+        }
+        try {
+            String result = mapper.writeValueAsString(bids);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            String result = "{\"error\":\"exception raised converting bids for lot " + lotId + "to json\"}";
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/lots/{lotId}/bids", method = RequestMethod.POST)
+    public ResponseEntity post(@PathVariable int lotId, @RequestBody Bid bid) {
+        // Check if lot exists
+        Lot lot = lotsRepository.getLotById(lotId);
+        if (lot == null) {
+            return new ResponseEntity<>("{\"error\":\"Lot with such id does not exist\"}", HttpStatus.NOT_FOUND);
+        }
+
+        // TODO: 11/17/18 Check if lot is active
+
+        // Place bid
+        bid.setId(0);
+        bid.setLotId(lotId);
+        int id = lotsRepository.saveBid(bid);
+        bid.setId(id);
+        return new ResponseEntity<>(bid, HttpStatus.OK);
     }
 }

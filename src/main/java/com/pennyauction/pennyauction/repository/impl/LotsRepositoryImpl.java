@@ -1,5 +1,6 @@
 package com.pennyauction.pennyauction.repository.impl;
 
+import com.pennyauction.pennyauction.model.Bid;
 import com.pennyauction.pennyauction.model.Category;
 import com.pennyauction.pennyauction.model.Lot;
 import com.pennyauction.pennyauction.model.Product;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,5 +79,31 @@ public class LotsRepositoryImpl implements LotsRepository {
         }
 
         return lot;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Bid> getBidsList(int lotId) {
+        Query query = entityManager.createNativeQuery("SELECT * FROM bids WHERE lot_id = :id", Bid.class);
+        query.setParameter("id", lotId);
+        return (List<Bid>) query.getResultList();
+    }
+
+    /**
+     * Create bid entry in DB
+     * @param bid bid object
+     * @return id of created bid, -1 if bid value is too low, -2 if another error
+     */
+    @SuppressWarnings("unchecked")
+    @Transactional
+    @Override
+    public int saveBid(Bid bid) {
+        entityManager.merge(bid);
+        String queryStr = "SELECT * FROM bids WHERE txid = :txid ORDER BY id DESC";
+        Query query = entityManager.createNativeQuery(queryStr, Bid.class);
+        query.setParameter("txid", bid.getTxid());
+        List<Bid> bids = (List<Bid>) query.getResultList();
+        if (bids != null && bids.size() > 0) return bids.get(0).getId();
+        return 0;
     }
 }

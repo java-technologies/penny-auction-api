@@ -1,5 +1,7 @@
 package com.pennyauction.pennyauction.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,8 +12,10 @@ public class Bid {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonProperty("lot_id")
     private int lotId;
 
+    @JsonProperty("depositor_id")
     private int depositorId;
 
     private String state;
