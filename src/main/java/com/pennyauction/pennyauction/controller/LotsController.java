@@ -1,7 +1,10 @@
 package com.pennyauction.pennyauction.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.pennyauction.pennyauction.model.Lot;
+import com.pennyauction.pennyauction.model.Product;
 import com.pennyauction.pennyauction.repository.contract.LotsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,8 +29,21 @@ public class LotsController {
     @GetMapping("/lots")
     public String list() {
         List<Lot> lots = lotsRepository.getLotsList();
+        ArrayNode array = mapper.createArrayNode();
+
+        for (Lot lot : lots) {
+            ObjectNode node = mapper.valueToTree(lot);
+            node.remove("product");
+            Product product = lot.getProduct();
+            node.put("product_id", product.getId());
+            node.put("product_name", product.getName());
+            node.put("product_description", product.getDescription());
+            node.putPOJO("category", product.getCategory());
+            array.add(node);
+        }
+
         try {
-            return mapper.writeValueAsString(lots);
+            return mapper.writeValueAsString(array);
         }
         catch (Exception ex) {
             return "{\"error\":\"exception raised converting lots list to json\"}";

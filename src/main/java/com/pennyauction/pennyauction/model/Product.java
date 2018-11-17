@@ -6,11 +6,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "products")
 @JsonPropertyOrder({"id", "lot_id", "category_id", "name", "description", "category"})
 public class Product {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     @JsonProperty("lot_id")

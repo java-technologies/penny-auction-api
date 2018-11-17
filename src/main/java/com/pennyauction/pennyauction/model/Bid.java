@@ -3,10 +3,11 @@ package com.pennyauction.pennyauction.model;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "bids")
 public class Bid {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     private int lotId;

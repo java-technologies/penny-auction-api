@@ -27,11 +27,12 @@ public class LotsRepositoryImpl implements LotsRepository {
         Map<Integer, Category> categoryMap = new HashMap<>(); // id to Category
         // Get products
         for (Lot lot : lots) {
-            Query productQuery = entityManager.createNativeQuery("SELECT * FROM products WHERE lot_id = :lid", Product.class);
+            Query productQuery = entityManager.createNativeQuery("SELECT * FROM products WHERE lot_id = :lid",
+                    Product.class);
             productQuery.setParameter("lid", lot.getId());
             List<Product> results = productQuery.getResultList();
             if (results.size() > 0) lot.setProduct((Product) productQuery.getSingleResult());
-            if (lot.getProduct() != null) categoryMap.put(lot.getProduct().getId(), null);
+            if (lot.getProduct() != null) categoryMap.put(lot.getProduct().getCategoryId(), null);
         }
         // Get categories
         if (categoryMap.keySet().size() > 0) {
@@ -63,12 +64,14 @@ public class LotsRepositoryImpl implements LotsRepository {
         Lot lot = lots.get(0);
 
         // Get product
-        Query productQuery = entityManager.createNativeQuery("SELECT * FROM products WHERE lot_id = :lid", Product.class);
+        Query productQuery = entityManager.createNativeQuery("SELECT * FROM products WHERE lot_id = :lid",
+                Product.class);
         productQuery.setParameter("lid", lot.getId());
         lot.setProduct((Product) productQuery.getSingleResult());
         if (lot.getProduct() != null) {
             // Get category
-            Query categoryQuery = entityManager.createNativeQuery("SELECT * FROM categories WHERE id = :cid", Category.class);
+            Query categoryQuery = entityManager.createNativeQuery("SELECT * FROM categories WHERE id = :cid",
+                    Category.class);
             categoryQuery.setParameter("cid", lot.getProduct().getCategoryId());
             lot.getProduct().setCategory((Category) categoryQuery.getSingleResult());
         }
