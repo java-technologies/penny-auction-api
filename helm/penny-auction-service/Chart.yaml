@@ -1,0 +1,5 @@
+name: penny-auction-service
+description: Penny Auction Java Back-end Service
+apiVersion: v1
+appVersion: develop
+version: 0.0.2
