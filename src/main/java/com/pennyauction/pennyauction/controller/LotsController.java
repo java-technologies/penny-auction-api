@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -58,13 +59,37 @@ public class LotsController {
             return new ResponseEntity<>("{\"error\":\"Lot with such id not found\"}", HttpStatus.NOT_FOUND);
         }
         try {
-            String result = mapper.writeValueAsString(lot);
-            return new ResponseEntity<>(result, HttpStatus.OK);
+            ObjectNode node = mapper.valueToTree(lot);
+            node.remove("product");
+            Product product = lot.getProduct();
+            node.put("product_id", product.getId());
+            node.put("product_name", product.getName());
+            node.put("product_description", product.getDescription());
+            node.putPOJO("category", product.getCategory());
+
+            return new ResponseEntity<>(node, HttpStatus.OK);
         }
         catch (Exception ex) {
             String result = "{\"error\":\"exception raised converting lot " + id + "to json\"}";
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/lots", method = RequestMethod.POST)
+    public ResponseEntity post(@RequestBody ObjectNode node) {
+        Lot lot = new Lot();
+        lot.setUserUid(node.get("user_uid").asText());
+        lot.setStartPrice((float) node.get("start_price").asDouble());
+        lot.setFinalPrice(lot.getStartPrice());
+        lot.setState("created");
+        lot.setStartDate(new Date());
+        Product product = new Product();
+        product.setName(node.get("product_name").asText());
+        product.setDescription(node.get("product_description").asText());
+        product.setCategoryId(node.get("category_id").asInt());
+
+        int id = lotsRepository.save(lot, product);
+        return get(id);
     }
 
     @RequestMapping(value = "/lots/{lotId}/bids", method = RequestMethod.GET)

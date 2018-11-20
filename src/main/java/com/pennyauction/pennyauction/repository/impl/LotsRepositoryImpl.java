@@ -28,13 +28,20 @@ public class LotsRepositoryImpl implements LotsRepository {
         List<Lot> lots = query.getResultList();
         Map<Integer, Category> categoryMap = new HashMap<>(); // id to Category
         // Get products
-        for (Lot lot : lots) {
+        for (int i = 0; i < lots.size(); i++) {
+            Lot lot = lots.get(i);
             Query productQuery = entityManager.createNativeQuery("SELECT * FROM products WHERE lot_id = :lid",
                     Product.class);
             productQuery.setParameter("lid", lot.getId());
             List<Product> results = productQuery.getResultList();
             if (results.size() > 0) lot.setProduct((Product) productQuery.getSingleResult());
-            if (lot.getProduct() != null) categoryMap.put(lot.getProduct().getCategoryId(), null);
+            if (lot.getProduct() != null) {
+                categoryMap.put(lot.getProduct().getCategoryId(), null);
+            }
+            else {
+                lots.remove(i);
+                i--;
+            }
         }
         // Get categories
         if (categoryMap.keySet().size() > 0) {
@@ -105,5 +112,24 @@ public class LotsRepositoryImpl implements LotsRepository {
         List<Bid> bids = (List<Bid>) query.getResultList();
         if (bids != null && bids.size() > 0) return bids.get(0).getId();
         return 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public int save(Lot lot, Product product) {
+        entityManager.merge(lot);
+        String queryStr = "SELECT * FROM lots ORDER BY id DESC LIMIT 1";
+        Query query = entityManager.createNativeQuery(queryStr, Lot.class);
+        List<Lot> lots = (List<Lot>) query.getResultList();
+        if (lots == null || lots.size() == 0) return 0;
+        int id = lots.get(0).getId();
+        product.setLotId(id);
+        entityManager.merge(product);
+        queryStr = "SELECT * FROM products ORDER BY id DESC LIMIT 1";
+        query = entityManager.createNativeQuery(queryStr, Product.class);
+        List<Product> products = (List<Product>) query.getResultList();
+        if (products == null || products.size() == 0) return 0;
+        return id;
     }
 }
