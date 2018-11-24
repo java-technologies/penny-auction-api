@@ -1,0 +1,8 @@
+To get the application URL run the following commands: 
+{{ if (.Values.service.type) and .Values.service.type eq "NodePort" }}
+    Minikube
+        minikube service {{ template "penny-auction-service.fullname" . }} --url
+    
+    otherwise
+{{- end }}        
+        echo http://127.0.0.1:{{ .Values.service.port }} && kubectl port-forward svc/{{ template "penny-auction-service.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}

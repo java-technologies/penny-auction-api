@@ -1,0 +1,24 @@
+fullnameOverride: penny-auction-service
+replicaCount: 1
+
+image:
+  repository: javatechnologies/penny-auction-service
+  tag: 0.1.1
+
+service:
+  type: NodePort
+  port: 8080
+
+health:
+  path: /actuator/health
+
+database:
+  name: app_db
+  user: app
+  credentials: service-db-secret
+
+resources:
+  requests:
+    memory: 521Mi
+  limits:
+    memory: 1024Mi
