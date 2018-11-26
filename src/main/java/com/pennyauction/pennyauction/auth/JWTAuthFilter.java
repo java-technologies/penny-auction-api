@@ -29,23 +29,23 @@ public class JWTAuthFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer")) {
+        String header = request.getHeader("Access-Token");
+        /*if (header == null || !header.startsWith("Bearer")) {
             SecurityContextHolder.getContext().setAuthentication(null);
             chain.doFilter(request, response);
             return;
-        }
+        }*/
         UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+        String token = request.getHeader("Access-Token");
         if (token != null) {
             RSAPublicKey publicKey;
             try {
-                String keyString = System.getenv("JWT_PUBLIC_KEY");
+                String keyString = System.getenv("RSA_PUBLIC_KEY");
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 byte[] bytes = Base64.decodeBase64(keyString);
                 publicKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(bytes));
@@ -53,7 +53,7 @@ public class JWTAuthFilter extends BasicAuthenticationFilter {
                 // Parse token.
                 String user = Jwts.parser()
                         .setSigningKey(publicKey)
-                        .parseClaimsJws(token.replace("Bearer ", ""))
+                        .parseClaimsJws(token)
                         .getBody()
                         .getSubject();
 
