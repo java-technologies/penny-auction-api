@@ -40,6 +40,8 @@ spec:
         imagePullPolicy: {{ . }}
         {{- end }}
         env:
+        - name: RSA_PUBLIC_KEY
+          value: {{ .Values.rsaPublicKey }}
         - name: DB_URL
           value: "jdbc:mysql://penny-auction-service-db-mysql:3306/{{ .Values.database.name }}"
         - name: DB_USER

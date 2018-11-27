@@ -29,6 +29,7 @@ services:
     ports:
     - 8080:8080
     environment:
+      RSA_PUBLIC_KEY: "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCs4PEsAfzfPRrQc6sI6RSVrpdEKXhhwxAbRZlTZYdXNVUg7rcg34PnLuZD86IjIqf3vEXrmsR64HzN/jWPF1WeoFlq7j467ms1OJxRDaNSAovxcjJZSCuWcwu18V7X/zmANsH/khy0pw2cVPd6AnyaGpihUjAwc6RiuNKgOVCVWQIDAQAB"
       DB_URL: jdbc:mysql://db:3306/auction
       DB_USER: app
       DB_PASSWORD: pass4app

@@ -3,7 +3,7 @@ replicaCount: 1
 
 image:
   repository: javatechnologies/penny-auction-service
-  tag: 0.1.1
+  tag: 0.2.2
 
 service:
   type: NodePort
@@ -22,3 +22,5 @@ resources:
     memory: 521Mi
   limits:
     memory: 1024Mi
+
+rsaPublicKey: "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCs4PEsAfzfPRrQc6sI6RSVrpdEKXhhwxAbRZlTZYdXNVUg7rcg34PnLuZD86IjIqf3vEXrmsR64HzN/jWPF1WeoFlq7j467ms1OJxRDaNSAovxcjJZSCuWcwu18V7X/zmANsH/khy0pw2cVPd6AnyaGpihUjAwc6RiuNKgOVCVWQIDAQAB"
