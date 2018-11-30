@@ -3,6 +3,7 @@ package com.pennyauction.pennyauction.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.pennyauction.pennyauction.kafka.KafkaSender;
 import com.pennyauction.pennyauction.model.Bid;
 import com.pennyauction.pennyauction.model.Lot;
 import com.pennyauction.pennyauction.model.Product;
@@ -28,6 +29,9 @@ public class LotsController {
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
+    @Autowired
+    KafkaSender kafkaSender;
+
     @GetMapping("/lots")
     public String list() {
         List<Lot> lots = lotsRepository.getLotsList();
@@ -45,6 +49,10 @@ public class LotsController {
         }
 
         try {
+
+            System.out.println("try to send message to kafka from Lots Controller");
+            kafkaSender.send("topic1", "Message from lots");
+
             return mapper.writeValueAsString(array);
         }
         catch (Exception ex) {
