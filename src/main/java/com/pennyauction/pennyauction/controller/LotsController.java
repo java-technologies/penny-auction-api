@@ -45,6 +45,7 @@ public class LotsController {
             node.put("product_id", product.getId());
             node.put("product_name", product.getName());
             node.put("product_description", product.getDescription());
+            node.put("photo", product.getPhoto());
             node.putPOJO("category", product.getCategory());
             array.add(node);
         }
@@ -70,6 +71,7 @@ public class LotsController {
             node.put("product_id", product.getId());
             node.put("product_name", product.getName());
             node.put("product_description", product.getDescription());
+            node.put("photo", product.getPhoto());
             node.putPOJO("category", product.getCategory());
 
             return new ResponseEntity<>(node, HttpStatus.OK);
@@ -92,6 +94,7 @@ public class LotsController {
         product.setName(node.get("product_name").asText());
         product.setDescription(node.get("product_description").asText());
         product.setCategoryId(node.get("category_id").asInt());
+        product.setPhoto(node.get("photo").asText());
 
         int id = lotsRepository.save(lot, product);
 

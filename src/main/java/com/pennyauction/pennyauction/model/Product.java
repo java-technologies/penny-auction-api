@@ -24,6 +24,8 @@ public class Product {
 
     private String description;
 
+    private String photo;
+
     @Transient
     private Category category;
 
@@ -73,5 +75,13 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }
