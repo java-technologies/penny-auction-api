@@ -3,6 +3,7 @@ package com.pennyauction.pennyauction.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.pennyauction.pennyauction.kafka.KafkaSender;
 import com.pennyauction.pennyauction.model.Bid;
 import com.pennyauction.pennyauction.model.Lot;
 import com.pennyauction.pennyauction.model.Product;
@@ -23,10 +24,14 @@ public class LotsController {
     private LotsRepository lotsRepository;
 
     @Autowired
+    KafkaSender kafkaSender;
+
+    @Autowired
     public LotsController(LotsRepository lotsRepository) {
         this.lotsRepository = lotsRepository;
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
+
 
     @GetMapping("/lots")
     public String list() {
@@ -40,6 +45,7 @@ public class LotsController {
             node.put("product_id", product.getId());
             node.put("product_name", product.getName());
             node.put("product_description", product.getDescription());
+            node.put("photo", product.getPhoto());
             node.putPOJO("category", product.getCategory());
             array.add(node);
         }
@@ -65,6 +71,7 @@ public class LotsController {
             node.put("product_id", product.getId());
             node.put("product_name", product.getName());
             node.put("product_description", product.getDescription());
+            node.put("photo", product.getPhoto());
             node.putPOJO("category", product.getCategory());
 
             return new ResponseEntity<>(node, HttpStatus.OK);
@@ -87,8 +94,12 @@ public class LotsController {
         product.setName(node.get("product_name").asText());
         product.setDescription(node.get("product_description").asText());
         product.setCategoryId(node.get("category_id").asInt());
+        product.setPhoto(node.get("photo").asText());
 
         int id = lotsRepository.save(lot, product);
+
+        kafkaSender.send("lot_creator-topic", "{lot_id: " + id + "}");
+
         return get(id);
     }
 
@@ -123,6 +134,10 @@ public class LotsController {
         bid.setLotId(lotId);
         int id = lotsRepository.saveBid(bid);
         bid.setId(id);
+
+//        not sure if we need this
+        kafkaSender.send("lot_creator-bid", "{bid_id: " + id + "}");
+
         return new ResponseEntity<>(bid, HttpStatus.OK);
     }
 }
