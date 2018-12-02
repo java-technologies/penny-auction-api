@@ -24,13 +24,14 @@ public class LotsController {
     private LotsRepository lotsRepository;
 
     @Autowired
+    KafkaSender kafkaSender;
+
+    @Autowired
     public LotsController(LotsRepository lotsRepository) {
         this.lotsRepository = lotsRepository;
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
-    @Autowired
-    KafkaSender kafkaSender;
 
     @GetMapping("/lots")
     public String list() {
@@ -49,10 +50,6 @@ public class LotsController {
         }
 
         try {
-
-            System.out.println("try to send message to kafka from Lots Controller");
-            kafkaSender.send("topic1", "Message from lots");
-
             return mapper.writeValueAsString(array);
         }
         catch (Exception ex) {
@@ -97,6 +94,9 @@ public class LotsController {
         product.setCategoryId(node.get("category_id").asInt());
 
         int id = lotsRepository.save(lot, product);
+
+        kafkaSender.send("lot_creator-topic", "{lot_id: " + id + "}");
+
         return get(id);
     }
 
@@ -131,6 +131,10 @@ public class LotsController {
         bid.setLotId(lotId);
         int id = lotsRepository.saveBid(bid);
         bid.setId(id);
+
+//        not sure if we need this
+        kafkaSender.send("lot_creator-bid", "{bid_id: " + id + "}");
+
         return new ResponseEntity<>(bid, HttpStatus.OK);
     }
 }

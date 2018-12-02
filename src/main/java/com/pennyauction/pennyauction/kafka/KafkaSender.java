@@ -33,7 +33,6 @@ public class KafkaSender {
 
     public void send(String topic, String payload) {
         kafkaTemplate.send(topic, payload);
-        System.out.println("Message: " + payload + " sent to topic: " + topic);
     }
 
 
