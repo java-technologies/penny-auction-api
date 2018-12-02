@@ -11,6 +11,7 @@ import com.pennyauction.pennyauction.repository.contract.LotsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -36,19 +37,34 @@ public class LotsController {
     @GetMapping("/lots")
     public String list() {
         List<Lot> lots = lotsRepository.getLotsList();
-        ArrayNode array = mapper.createArrayNode();
+        ArrayNode array = lotsToJson(lots);
 
-        for (Lot lot : lots) {
-            ObjectNode node = mapper.valueToTree(lot);
-            node.remove("product");
-            Product product = lot.getProduct();
-            node.put("product_id", product.getId());
-            node.put("product_name", product.getName());
-            node.put("product_description", product.getDescription());
-            node.put("photo", product.getPhoto());
-            node.putPOJO("category", product.getCategory());
-            array.add(node);
+        try {
+            return mapper.writeValueAsString(array);
         }
+        catch (Exception ex) {
+            return "{\"error\":\"exception raised converting lots list to json\"}";
+        }
+    }
+
+    @GetMapping("/users/{uid}/lots")
+    public String listByUser(@PathVariable String uid) {
+        List<Lot> lots = lotsRepository.getLotsListByUser(uid);
+        ArrayNode array = lotsToJson(lots);
+
+        try {
+            return mapper.writeValueAsString(array);
+        }
+        catch (Exception ex) {
+            return "{\"error\":\"exception raised converting lots list to json\"}";
+        }
+    }
+
+    @GetMapping("/self/lots")
+    public String listByUser(Authentication authentication) {
+        System.out.println(authentication);
+        List<Lot> lots = lotsRepository.getLotsListByUser(authentication.getPrincipal().toString());
+        ArrayNode array = lotsToJson(lots);
 
         try {
             return mapper.writeValueAsString(array);
@@ -83,9 +99,9 @@ public class LotsController {
     }
 
     @RequestMapping(value = "/lots", method = RequestMethod.POST)
-    public ResponseEntity post(@RequestBody ObjectNode node) {
+    public ResponseEntity post(Authentication authentication, @RequestBody ObjectNode node) {
         Lot lot = new Lot();
-        lot.setUserUid(node.get("user_uid").asText());
+        lot.setUserUid(authentication.getPrincipal().toString());
         lot.setStartPrice((float) node.get("start_price").asDouble());
         lot.setFinalPrice(lot.getStartPrice());
         lot.setState("created");
@@ -139,5 +155,23 @@ public class LotsController {
         kafkaSender.send("lot_creator-bid", "{bid_id: " + id + "}");
 
         return new ResponseEntity<>(bid, HttpStatus.OK);
+    }
+
+    private ArrayNode lotsToJson(List<Lot> lots) {
+        ArrayNode array = mapper.createArrayNode();
+
+        for (Lot lot : lots) {
+            ObjectNode node = mapper.valueToTree(lot);
+            node.remove("product");
+            Product product = lot.getProduct();
+            node.put("product_id", product.getId());
+            node.put("product_name", product.getName());
+            node.put("product_description", product.getDescription());
+            node.put("photo", product.getPhoto());
+            node.putPOJO("category", product.getCategory());
+            array.add(node);
+        }
+
+        return array;
     }
 }

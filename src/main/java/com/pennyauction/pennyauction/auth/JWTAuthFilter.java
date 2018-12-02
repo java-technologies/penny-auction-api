@@ -55,7 +55,7 @@ public class JWTAuthFilter extends BasicAuthenticationFilter {
                         .setSigningKey(publicKey)
                         .parseClaimsJws(token)
                         .getBody()
-                        .getSubject();
+                        .get("preferred_username").toString();
 
                 if (user != null) {
                     return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());

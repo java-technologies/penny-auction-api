@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface LotsRepository {
     List<Lot> getLotsList();
+    List<Lot> getLotsListByUser(String uid);
     Lot getLotById(int id);
     List<Bid> getBidsList(int lotId);
     int saveBid(Bid bid);

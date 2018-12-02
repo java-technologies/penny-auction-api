@@ -25,6 +25,18 @@ public class LotsRepositoryImpl implements LotsRepository {
     @Override
     public List<Lot> getLotsList() {
         Query query = entityManager.createNativeQuery("SELECT * FROM lots", Lot.class);
+        return lotsList(query);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Lot> getLotsListByUser(String uid) {
+        Query query = entityManager.createNativeQuery("SELECT * FROM lots WHERE user_uid = :uid", Lot.class);
+        query.setParameter("uid", uid);
+        return lotsList(query);
+    }
+
+    private List<Lot> lotsList(Query query) {
         List<Lot> lots = query.getResultList();
         Map<Integer, Category> categoryMap = new HashMap<>(); // id to Category
         // Get products
