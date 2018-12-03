@@ -152,7 +152,7 @@ public class LotsController {
         bid.setId(id);
 
 //        not sure if we need this
-        kafkaSender.send("lot_creator-bid", "{bid_id: " + id + "}");
+        kafkaSender.send("bid_creator-topic", "{bid_id: " + id + "}");
 
         return new ResponseEntity<>(bid, HttpStatus.OK);
     }
