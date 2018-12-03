@@ -15,8 +15,8 @@ public class Bid {
     @JsonProperty("lot_id")
     private int lotId;
 
-    @JsonProperty("depositor_id")
-    private int depositorId;
+    @JsonProperty("depositor_uid")
+    private String depositorUid;
 
     private String state;
 
@@ -38,12 +38,12 @@ public class Bid {
         this.lotId = lotId;
     }
 
-    public int getDepositorId() {
-        return depositorId;
+    public String getDepositorUid() {
+        return depositorUid;
     }
 
-    public void setDepositorId(int depositorId) {
-        this.depositorId = depositorId;
+    public void setDepositorUid(String depositorUid) {
+        this.depositorUid = depositorUid;
     }
 
     public String getState() {

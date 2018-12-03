@@ -136,7 +136,7 @@ public class LotsController {
     }
 
     @RequestMapping(value = "/lots/{lotId}/bids", method = RequestMethod.POST)
-    public ResponseEntity post(@PathVariable int lotId, @RequestBody Bid bid) {
+    public ResponseEntity post(Authentication authentication, @PathVariable int lotId, @RequestBody Bid bid) {
         // Check if lot exists
         Lot lot = lotsRepository.getLotById(lotId);
         if (lot == null) {
@@ -147,6 +147,8 @@ public class LotsController {
 
         // Place bid
         bid.setId(0);
+        bid.setState("created");
+        bid.setDepositorUid(authentication.getPrincipal().toString());
         bid.setLotId(lotId);
         int id = lotsRepository.saveBid(bid);
         bid.setId(id);
