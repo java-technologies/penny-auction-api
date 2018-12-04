@@ -55,6 +55,7 @@ public class AddressesController {
         }
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/addresses", method = RequestMethod.POST)
     public ResponseEntity post(@RequestBody Address address) {
         address.setId(0);

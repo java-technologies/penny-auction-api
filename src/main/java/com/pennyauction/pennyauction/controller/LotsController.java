@@ -98,6 +98,7 @@ public class LotsController {
         }
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/lots", method = RequestMethod.POST)
     public ResponseEntity post(Authentication authentication, @RequestBody ObjectNode node) {
         Lot lot = new Lot();
@@ -135,6 +136,7 @@ public class LotsController {
         }
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/lots/{lotId}/bids", method = RequestMethod.POST)
     public ResponseEntity post(Authentication authentication, @PathVariable int lotId, @RequestBody Bid bid) {
         // Check if lot exists
