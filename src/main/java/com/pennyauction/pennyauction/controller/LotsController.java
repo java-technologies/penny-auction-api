@@ -171,6 +171,10 @@ public class LotsController {
         int id = lotsRepository.saveBid(bid);
         bid.setId(id);
 
+        float newPrice = lot.getFinalPrice() + lot.getStartPrice() * 0.2f;
+        lot.setFinalPrice(newPrice);
+        lotsRepository.updateLot(lot);
+
 //        not sure if we need this
         kafkaSender.send("bid_creator-topic", "{\"bid_id\": " + id + "}");
 

@@ -12,6 +12,7 @@ public interface LotsRepository {
     List<Lot> getLotsList();
     List<Lot> getLotsListByUser(String uid);
     Lot getLotById(int id);
+    void updateLot(Lot lot);
     List<Bid> getBidsList(int lotId);
     int saveBid(Bid bid);
     int save(Lot lot, Product product);

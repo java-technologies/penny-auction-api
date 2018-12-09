@@ -101,6 +101,13 @@ public class LotsRepositoryImpl implements LotsRepository {
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional
+    @Override
+    public void updateLot(Lot lot) {
+        entityManager.merge(lot);
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public List<Bid> getBidsList(int lotId) {
         Query query = entityManager.createNativeQuery("SELECT * FROM bids WHERE lot_id = :id", Bid.class);
