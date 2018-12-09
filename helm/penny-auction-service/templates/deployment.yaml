@@ -51,6 +51,8 @@ spec:
             secretKeyRef:
               name: {{ .Values.database.credentials }}
               key: mysql-password
+        - name: KAFKA_URL
+          value: "http://penny-auction-kafka-kafk:9092"
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         ports:

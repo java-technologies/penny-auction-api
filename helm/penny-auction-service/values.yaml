@@ -3,7 +3,7 @@ replicaCount: 1
 
 image:
   repository: javatechnologies/penny-auction-service
-  tag: 0.2.2
+  tag: 0.3.0
 
 service:
   type: NodePort
