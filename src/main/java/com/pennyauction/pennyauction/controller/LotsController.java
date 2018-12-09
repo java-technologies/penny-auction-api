@@ -122,12 +122,28 @@ public class LotsController {
 
     @RequestMapping(value = "/lots/{lotId}/bids", method = RequestMethod.GET)
     public ResponseEntity getBids(@PathVariable int lotId) {
+        Lot lot = lotsRepository.getLotById(lotId);
         List<Bid> bids = lotsRepository.getBidsList(lotId);
+
         if (bids == null) {
             return new ResponseEntity<>("{\"error\":\"Lot with such id does not exist\"}", HttpStatus.NOT_FOUND);
         }
+
+        float currentPrice = lot.getStartPrice();
+        float priceIncrement = lot.getStartPrice() * 0.2f;
+        ArrayNode rootNode = mapper.createArrayNode();
+        for (Bid bid : bids) {
+            ObjectNode node = mapper.createObjectNode();
+            node.put("id", bid.getId());
+            node.put("depositor_uid", bid.getDepositorUid());
+            node.put("amount", currentPrice);
+            node.put("txid", bid.getTxid());
+            currentPrice += priceIncrement;
+            rootNode.add(node);
+        }
+
         try {
-            String result = mapper.writeValueAsString(bids);
+            String result = mapper.writeValueAsString(rootNode);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         catch (Exception ex) {
